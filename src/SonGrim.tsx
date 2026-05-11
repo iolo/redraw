@@ -1,13 +1,11 @@
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import type { ChangeEvent, PointerEvent as ReactPointerEvent } from 'react';
 import './styles.css';
+import { ColorEditorDialog } from './components/ColorEditorDialog';
+import { ColorStatus } from './components/ColorStatus';
+import { ColorSwatches } from './components/ColorSwatches';
+import { ControlsPanel } from './components/ControlsPanel';
+import { ToolPalette } from './components/ToolPalette';
 import type { RgbaColor, SonGrimProps, SonGrimRef, Tool } from './types';
 import { normalizeHex, rgbaToHex, rgbaToString, toSliderState } from './utils/color';
 import {
@@ -96,8 +94,9 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
   const [currentBackgroundColor, setCurrentBackgroundColor] = useState(backgroundColor);
   const [strokeRgba, setStrokeRgba] = useState<RgbaColor>(() => toSliderState(strokeColor));
   const [fillRgba, setFillRgba] = useState<RgbaColor>(() => toSliderState(fillColor));
-  const [backgroundRgba, setBackgroundRgba] = useState<RgbaColor>(() => toSliderState(backgroundColor));
   const [historyState, setHistoryState] = useState({ canUndo: false, canRedo: false });
+  const [activeColorTarget, setActiveColorTarget] = useState<'stroke' | 'fill'>('stroke');
+  const [isColorEditorOpen, setIsColorEditorOpen] = useState(false);
 
   const publishChange = (backgroundOverride?: string) => {
     const drawingCanvas = drawingCanvasRef.current;
@@ -151,7 +150,6 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
 
     applySnapshot(drawingCtx, snapshot, backgroundCanvas);
     setCurrentBackgroundColor(snapshot.backgroundColor);
-    setBackgroundRgba(toSliderState(snapshot.backgroundColor));
     refreshHistoryState();
     publishChange(snapshot.backgroundColor);
   };
@@ -166,14 +164,6 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
     previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
   };
 
-  const commitBackgroundColor = (nextColor: string) => {
-    setCurrentBackgroundColor(nextColor);
-    setBackgroundRgba(toSliderState(nextColor));
-    syncBackground(backgroundCanvasRef.current, nextColor);
-    pushHistory(nextColor);
-    publishChange(nextColor);
-  };
-
   const setColorState = (
     setter: (value: string) => void,
     rgbaSetter: (value: RgbaColor) => void,
@@ -181,6 +171,22 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
   ) => {
     setter(value);
     rgbaSetter(toSliderState(value));
+  };
+
+  const setColorForTarget = (target: 'stroke' | 'fill', value: string) => {
+    if (target === 'stroke') {
+      setColorState(setCurrentStrokeColor, setStrokeRgba, value);
+      return;
+    }
+
+    setColorState(setCurrentFillColor, setFillRgba, value);
+  };
+
+  const swapColors = () => {
+    const nextStroke = currentFillColor;
+    const nextFill = currentStrokeColor;
+    setColorState(setCurrentStrokeColor, setStrokeRgba, nextStroke);
+    setColorState(setCurrentFillColor, setFillRgba, nextFill);
   };
 
   const loadDataUrl = async (nextDataUrl: string) => {
@@ -230,7 +236,6 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
 
   useEffect(() => {
     setCurrentBackgroundColor(backgroundColor);
-    setBackgroundRgba(toSliderState(backgroundColor));
     syncBackground(backgroundCanvasRef.current, backgroundColor);
   }, [backgroundColor]);
 
@@ -378,10 +383,8 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
     }
 
     const sampled = rgbaFromCanvas(drawingCtx, point.x, point.y);
-    const fallback = sampled.a === 0 ? backgroundRgba : sampled;
-    const colorString = rgbaToString(fallback);
-    setColorState(setCurrentStrokeColor, setStrokeRgba, colorString);
-    setColorState(setCurrentFillColor, setFillRgba, colorString);
+    const fallback = sampled.a === 0 ? toSliderState(currentBackgroundColor) : sampled;
+    setColorForTarget(activeColorTarget, rgbaToString(fallback));
   };
 
   const applyFill = (point: Point) => {
@@ -502,232 +505,84 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
     event.currentTarget.releasePointerCapture(event.pointerId);
   };
 
-  const updateFromHex = (
-    event: ChangeEvent<HTMLInputElement>,
-    setter: (value: string) => void,
-    rgbaSetter: (value: RgbaColor) => void
-  ) => {
-    const normalized = normalizeHex(event.target.value);
-    setter(normalized);
-    rgbaSetter(toSliderState(normalized));
+  const updateTargetFromHex = (event: ChangeEvent<HTMLInputElement>) => {
+    setColorForTarget(activeColorTarget, normalizeHex(event.target.value));
   };
 
-  const updateFromSlider = (
-    channel: keyof RgbaColor,
-    value: number,
-    current: RgbaColor,
-    setter: (value: string) => void,
-    rgbaSetter: (value: RgbaColor) => void
-  ) => {
+  const updateTargetFromSlider = (channel: keyof RgbaColor, value: number) => {
+    const current = activeColorTarget === 'stroke' ? strokeRgba : fillRgba;
     const next = { ...current, [channel]: value };
-    const nextColor = rgbaToString(next);
-    setter(nextColor);
-    rgbaSetter(next);
+    setColorForTarget(activeColorTarget, rgbaToString(next));
   };
 
-  const toolbarActions = useMemo(
-    () => [
-      {
-        label: 'Undo',
-        onClick: () => restoreSnapshot('undo'),
-        disabled: !historyState.canUndo
-      },
-      {
-        label: 'Redo',
-        onClick: () => restoreSnapshot('redo'),
-        disabled: !historyState.canRedo
-      },
-      {
-        label: 'Clear',
-        onClick: () => {
-          createEmptyDrawing(drawingCanvasRef.current);
-          pushHistory();
-          publishChange();
-        },
-        disabled: false
-      }
-    ],
-    [historyState.canRedo, historyState.canUndo, currentBackgroundColor]
-  );
+  const currentActiveColor = activeColorTarget === 'stroke' ? currentStrokeColor : currentFillColor;
+  const currentActiveRgba = activeColorTarget === 'stroke' ? strokeRgba : fillRgba;
 
   return (
     <div className="songrim">
-      <div className="songrim__toolbar">
-        <label className="songrim__field">
-          <span>Tool</span>
-          <select value={currentTool} onChange={(event) => setCurrentTool(event.target.value as Tool)}>
-            {TOOLS.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="songrim__field">
-          <span>Stroke width</span>
-          <input
-            type="range"
-            min={1}
-            max={48}
-            value={currentStrokeWidth}
-            onChange={(event) => setCurrentStrokeWidth(Number(event.target.value))}
-          />
-        </label>
-
-        <div className="songrim__color-group">
-          <span>Stroke</span>
-          <div className="songrim__swatches">
-            {DEFAULT_SWATCHES.map((swatch) => (
-              <button
-                type="button"
-                key={`stroke-${swatch}`}
-                aria-label={`Stroke ${swatch}`}
-                className="songrim__swatch"
-                style={{ backgroundColor: swatch }}
-                onClick={() => setColorState(setCurrentStrokeColor, setStrokeRgba, swatch)}
-              />
-            ))}
-          </div>
-          <div className="songrim__sliders">
-            {(['r', 'g', 'b', 'a'] as Array<keyof RgbaColor>).map((channel) => (
-              <label key={`stroke-${channel}`} className="songrim__slider">
-                <span>{channel.toUpperCase()}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={255}
-                  value={strokeRgba[channel]}
-                  onChange={(event) =>
-                    updateFromSlider(
-                      channel,
-                      Number(event.target.value),
-                      strokeRgba,
-                      setCurrentStrokeColor,
-                      setStrokeRgba
-                    )
-                  }
-                />
-              </label>
-            ))}
-          </div>
-          <input
-            aria-label="Stroke hex"
-            value={rgbaToHex(strokeRgba)}
-            onChange={(event) => updateFromHex(event, setCurrentStrokeColor, setStrokeRgba)}
-          />
-        </div>
-
-        <div className="songrim__color-group">
-          <span>Fill</span>
-          <div className="songrim__swatches">
-            {DEFAULT_SWATCHES.map((swatch) => (
-              <button
-                type="button"
-                key={`fill-${swatch}`}
-                aria-label={`Fill ${swatch}`}
-                className="songrim__swatch"
-                style={{ backgroundColor: swatch }}
-                onClick={() => setColorState(setCurrentFillColor, setFillRgba, swatch)}
-              />
-            ))}
-          </div>
-          <div className="songrim__sliders">
-            {(['r', 'g', 'b', 'a'] as Array<keyof RgbaColor>).map((channel) => (
-              <label key={`fill-${channel}`} className="songrim__slider">
-                <span>{channel.toUpperCase()}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={255}
-                  value={fillRgba[channel]}
-                  onChange={(event) =>
-                    updateFromSlider(
-                      channel,
-                      Number(event.target.value),
-                      fillRgba,
-                      setCurrentFillColor,
-                      setFillRgba
-                    )
-                  }
-                />
-              </label>
-            ))}
-          </div>
-          <input
-            aria-label="Fill hex"
-            value={rgbaToHex(fillRgba)}
-            onChange={(event) => updateFromHex(event, setCurrentFillColor, setFillRgba)}
-          />
-        </div>
-
-        <div className="songrim__color-group">
-          <span>Background</span>
-          <div className="songrim__swatches">
-            {DEFAULT_SWATCHES.map((swatch) => (
-              <button
-                type="button"
-                key={`background-${swatch}`}
-                aria-label={`Background ${swatch}`}
-                className="songrim__swatch"
-                style={{ backgroundColor: swatch }}
-                onClick={() => commitBackgroundColor(swatch)}
-              />
-            ))}
-          </div>
-          <div className="songrim__sliders">
-            {(['r', 'g', 'b', 'a'] as Array<keyof RgbaColor>).map((channel) => (
-              <label key={`background-${channel}`} className="songrim__slider">
-                <span>{channel.toUpperCase()}</span>
-                <input
-                  type="range"
-                  min={0}
-                  max={255}
-                  value={backgroundRgba[channel]}
-                  onChange={(event) => {
-                    const next = { ...backgroundRgba, [channel]: Number(event.target.value) };
-                    const nextColor = rgbaToString(next);
-                    setCurrentBackgroundColor(nextColor);
-                    setBackgroundRgba(next);
-                  }}
-                  onMouseUp={() => commitBackgroundColor(rgbaToString(backgroundRgba))}
-                />
-              </label>
-            ))}
-          </div>
-          <input
-            aria-label="Background hex"
-            value={rgbaToHex(backgroundRgba)}
-            onChange={(event) => {
-              const normalized = normalizeHex(event.target.value);
-              setCurrentBackgroundColor(normalized);
-              setBackgroundRgba(toSliderState(normalized));
-              syncBackground(backgroundCanvasRef.current, normalized);
+      <div className="songrim__workspace">
+        <aside className="songrim__sidebar">
+          <ToolPalette activeTool={currentTool} onToolChange={setCurrentTool} tools={TOOLS} />
+          <ControlsPanel
+            strokeWidth={currentStrokeWidth}
+            canUndo={historyState.canUndo}
+            canRedo={historyState.canRedo}
+            onStrokeWidthChange={setCurrentStrokeWidth}
+            onUndo={() => restoreSnapshot('undo')}
+            onRedo={() => restoreSnapshot('redo')}
+            onClear={() => {
+              createEmptyDrawing(drawingCanvasRef.current);
+              pushHistory();
+              publishChange();
             }}
-            onBlur={() => commitBackgroundColor(currentBackgroundColor)}
+          />
+        </aside>
+
+        <section className="songrim__main">
+          <div className="songrim__stage-panel">
+            <div className="songrim__stage" style={{ width, height }}>
+              <canvas className="songrim__canvas songrim__canvas--background" ref={backgroundCanvasRef} />
+              <canvas
+                className="songrim__canvas songrim__canvas--drawing"
+                ref={drawingCanvasRef}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+              />
+              <canvas className="songrim__canvas songrim__canvas--preview" ref={previewCanvasRef} />
+            </div>
+          </div>
+        </section>
+
+        <div className="songrim__footer">
+          <ColorStatus
+            strokeColor={currentStrokeColor}
+            fillColor={currentFillColor}
+            activeTarget={activeColorTarget}
+            onTargetChange={setActiveColorTarget}
+            onSwap={swapColors}
+          />
+          <ColorSwatches
+            swatches={DEFAULT_SWATCHES}
+            activeTarget={activeColorTarget}
+            activeColor={rgbaToHex(currentActiveRgba)}
+            onSelectColor={(swatch) => setColorForTarget(activeColorTarget, swatch)}
+            onCustomizeColor={() => setIsColorEditorOpen(true)}
           />
         </div>
-
-        <div className="songrim__actions">
-          {toolbarActions.map((action) => (
-            <button key={action.label} type="button" onClick={action.onClick} disabled={action.disabled}>
-              {action.label}
-            </button>
-          ))}
-        </div>
       </div>
 
-      <div className="songrim__stage" style={{ width, height }}>
-        <canvas className="songrim__canvas songrim__canvas--background" ref={backgroundCanvasRef} />
-        <canvas
-          className="songrim__canvas songrim__canvas--drawing"
-          ref={drawingCanvasRef}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
+      {isColorEditorOpen ? (
+        <ColorEditorDialog
+          color={currentActiveColor}
+          hexValue={rgbaToHex(currentActiveRgba)}
+          rgba={currentActiveRgba}
+          target={activeColorTarget}
+          onChannelChange={updateTargetFromSlider}
+          onHexChange={updateTargetFromHex}
+          onClose={() => setIsColorEditorOpen(false)}
         />
-        <canvas className="songrim__canvas songrim__canvas--preview" ref={previewCanvasRef} />
-      </div>
+      ) : null}
     </div>
   );
 });

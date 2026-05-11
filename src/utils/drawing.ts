@@ -2,14 +2,38 @@ import type { HistorySnapshot, RgbaColor } from '../types';
 import { parseColor, samePixel } from './color';
 
 export const DEFAULT_SWATCHES = [
-  '#101418',
-  '#fafaf9',
-  '#ff6b35',
-  '#1f7a8c',
-  '#2d6a4f',
-  '#d90429',
-  '#4361ee',
-  '#f4a261'
+  '#000000',
+  '#7f7f7f',
+  '#880015',
+  '#ed1c24',
+  '#ff7f27',
+  '#fff200',
+  '#22b14c',
+  '#00a2e8',
+  '#3f48cc',
+  '#a349a4',
+  '#ffffff',
+  '#c3c3c3',
+  '#b97a57',
+  '#ffaec9',
+  '#ffc90e',
+  '#efe4b0',
+  '#b5e61d',
+  '#99d9ea',
+  '#7092be',
+  '#c8bfe7',
+  '#404040',
+  '#bfbfbf',
+  '#5c4033',
+  '#ff99c8',
+  '#ffb347',
+  '#fdfd96',
+  '#77dd77',
+  '#aec6cf',
+  '#779ecb',
+  '#cdb4db',
+  '#1b1b1b',
+  '#e8e8e8'
 ];
 
 export const createSnapshot = (

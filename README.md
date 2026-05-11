@@ -69,10 +69,13 @@ function App() {
 ## Features
 
 - Pen, Spray, Eraser, Spoid(Picker), Fill, Line, Rectangle, Circle(Ellipse) tools
-- Stroke width and color selection
-- Fill color selection
-- Color Palettes: Swatches, RGBA slider, HEX input
-- Background color selection
+- Paint-style layout: tools at top-left, controls below tools, drawing area on the right, colors at bottom-left, and palette at bottom-right
+- SVG-based tool and action icons styled with CSS
+- Stroke width control
+- Shared 32-color palette for stroke and fill
+- Current stroke/fill previews with swap action
+- Custom color dialog with RGBA sliders and HEX input
+- Background color property support
 - Undo/Redo
 - Load/Save drawing as data URL
 - Utilities for manipulating/loading/saving images
