@@ -1,8 +1,6 @@
-# songrim
+# redraw
 
-SonGrim is MSPaint-like drawing component for React. It provides a simple interface for drawing on a canvas, and it supports loading/saving the drawing as a data URL.
-
-> 'son' means 'hand' in Korean, and 'grim' means 'drawing' in Korean. So, 'songrim' means 'drawing by hand' in Korean.
+Redraw is an MSPaint-like drawing component for React. It provides a simple interface for drawing on a canvas, and it supports loading and saving the drawing as a data URL.
 
 [![Drawing Hands by M. C. Escher](DrawingHands.jpg)](https://mcescher.com/gallery/back-in-holland/#iLightbox[gallery_image_1]/31)
 
@@ -10,32 +8,32 @@ SonGrim is MSPaint-like drawing component for React. It provides a simple interf
 
 Install dependency:
 ```console
-$ npm install @iolo/songrim
+$ npm install @iolo/redraw
 ```
 
 Import and use the component:
 ```jsx
-import { SonGrim } from '@iolo/songrim';
+import { Redraw } from '@iolo/redraw';
 
 function App() {
-  return (<SonGrim onChange={(dataUrl) => console.log(dataUrl)} />);
+  return (<Redraw onChange={(dataUrl) => console.log(dataUrl)} />);
 }
 ```
 
 That's it! You can now draw on the canvas and save your drawing as a data URL.
 
-You can use `useRef` to get the reference of the SonGrim component and call its methods to manipulate the drawing
+You can use `useRef` to get the reference of the Redraw component and call its methods to manipulate the drawing
 programmatically.
 
 ```jsx
 import { useRef } from 'react';
-import { SonGrim, SonGrimRef, loadImage, saveImage } from '@iolo/songrim';
+import { Redraw, RedrawRef, loadImage, saveImage } from '@iolo/redraw';
 function App() {
-  const sonGrimRef = useRef<SonGrimRef>(null);
+  const redrawRef = useRef<RedrawRef>(null);
 
   const handleSave = () => {
-    if (sonGrimRef.current) {
-      const dataUrl = sonGrimRef.current.getDataUrl(); // get the drawing as data URL
+    if (redrawRef.current) {
+      const dataUrl = redrawRef.current.getDataUrl(); // get the drawing as data URL
       saveImage(dataUrl, 'drawing.png'); // download(save on local) the image as file
     }
   };
@@ -43,13 +41,13 @@ function App() {
   const handleOpen = async (event) => {
     const file = event.target.files[0];
     const dataUrl = await loadImage(file); // load the image file as data URL
-    sonGrimRef.current?.setDataUrl(dataUrl); // load the data URL into SonGrim
+    redrawRef.current?.setDataUrl(dataUrl); // load the data URL into Redraw
   };
 
   return (
     <>
-      <SonGrim
-        ref={sonGrimRef}
+      <Redraw
+        ref={redrawRef}
         width={500}
         height={500}
         tool="pen"

@@ -1,12 +1,12 @@
 import { createRef } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { SonGrim } from '../../src/SonGrim';
-import type { SonGrimRef } from '../../src/types';
+import { Redraw } from '../../src/Redraw';
+import type { RedrawRef } from '../../src/types';
 
-describe('SonGrim', () => {
+describe('Redraw', () => {
   it('renders the paint-style controls and canvas layers', () => {
-    render(<SonGrim width={320} height={180} />);
+    render(<Redraw width={320} height={180} />);
 
     expect(screen.getByRole('heading', { name: 'Tools' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Stroke' })).toBeTruthy();
@@ -15,7 +15,7 @@ describe('SonGrim', () => {
   });
 
   it('opens the custom color dialog from the swatch palette', () => {
-    render(<SonGrim width={320} height={180} />);
+    render(<Redraw width={320} height={180} />);
 
     const firstSwatch = screen.getAllByRole('gridcell', { name: /Swatch/i })[0];
     fireEvent.doubleClick(firstSwatch);
@@ -25,8 +25,8 @@ describe('SonGrim', () => {
   });
 
   it('exposes imperative methods', async () => {
-    const ref = createRef<SonGrimRef>();
-    render(<SonGrim ref={ref} />);
+    const ref = createRef<RedrawRef>();
+    render(<Redraw ref={ref} />);
 
     expect(ref.current?.getDataUrl()).toContain('data:image/png');
     await expect(ref.current?.setDataUrl('')).resolves.toBeUndefined();
@@ -36,7 +36,7 @@ describe('SonGrim', () => {
 
   it('fires onChange after clear', async () => {
     const onChange = vi.fn();
-    render(<SonGrim onChange={onChange} />);
+    render(<Redraw onChange={onChange} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
 

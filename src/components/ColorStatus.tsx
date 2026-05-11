@@ -13,7 +13,7 @@ const ICON_PROPS = {
   strokeWidth: 1.8,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
-  className: 'songrim__action-icon-svg',
+  className: 'redraw__action-icon-svg',
   'aria-hidden': true
 };
 
@@ -25,13 +25,13 @@ export function ColorStatus({
   onSwap
 }: ColorStatusProps) {
   return (
-    <section className="songrim__panel songrim__color-status" aria-labelledby="songrim-colors-title">
-      <div className="songrim__panel-heading">
-        <h2 id="songrim-colors-title" className="songrim__panel-title">
+    <section className="redraw__panel redraw__color-status" aria-labelledby="redraw-colors-title">
+      <div className="redraw__panel-heading">
+        <h2 id="redraw-colors-title" className="redraw__panel-title">
           Colors
         </h2>
-        <button type="button" className="songrim__swap-button" onClick={onSwap} aria-label="Swap">
-          <span className="songrim__action-icon">
+        <button type="button" className="redraw__swap-button" onClick={onSwap} aria-label="Swap">
+          <span className="redraw__action-icon">
             <svg {...ICON_PROPS}>
               <path d="M7 8h10" />
               <path d="m13 4 4 4-4 4" />
@@ -41,26 +41,26 @@ export function ColorStatus({
           </span>
         </button>
       </div>
-      <div className="songrim__color-preview-stack">
+      <div className="redraw__color-preview-stack">
         <button
           type="button"
-          className="songrim__current-color"
+          className="redraw__current-color"
           data-active={activeTarget === 'stroke' ? 'true' : 'false'}
           onClick={() => onTargetChange('stroke')}
           aria-pressed={activeTarget === 'stroke'}
         >
-          <span className="songrim__current-color-chip" style={{ backgroundColor: strokeColor }} />
-          <span className="songrim__current-color-label">Stroke</span>
+          <span className="redraw__current-color-chip" style={{ backgroundColor: strokeColor }} />
+          <span className="redraw__current-color-label">Stroke</span>
         </button>
         <button
           type="button"
-          className="songrim__current-color"
+          className="redraw__current-color"
           data-active={activeTarget === 'fill' ? 'true' : 'false'}
           onClick={() => onTargetChange('fill')}
           aria-pressed={activeTarget === 'fill'}
         >
-          <span className="songrim__current-color-chip" style={{ backgroundColor: fillColor }} />
-          <span className="songrim__current-color-label">Fill</span>
+          <span className="redraw__current-color-chip" style={{ backgroundColor: fillColor }} />
+          <span className="redraw__current-color-label">Fill</span>
         </button>
       </div>
     </section>

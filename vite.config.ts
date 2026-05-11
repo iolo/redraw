@@ -14,8 +14,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: 'src/index.ts',
-      name: 'SonGrim',
-      fileName: (format) => (format === 'es' ? 'songrim.js' : 'songrim.cjs'),
+      name: 'Redraw',
+      fileName: (format) => (format === 'es' ? 'redraw.js' : 'redraw.cjs'),
       formats: ['es', 'cjs']
     },
     sourcemap: true,

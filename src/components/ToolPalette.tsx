@@ -19,7 +19,7 @@ const ICON_PROPS = {
   strokeWidth: 1.8,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
-  className: 'songrim__tool-icon-svg',
+  className: 'redraw__tool-icon-svg',
   'aria-hidden': true
 };
 
@@ -83,13 +83,13 @@ interface ToolPaletteProps {
 
 export function ToolPalette({ activeTool, onToolChange, tools }: ToolPaletteProps) {
   return (
-    <section className="songrim__panel songrim__tools" aria-labelledby="songrim-tools-title">
-      <div className="songrim__panel-heading">
-        <h2 id="songrim-tools-title" className="songrim__panel-title">
+    <section className="redraw__panel redraw__tools" aria-labelledby="redraw-tools-title">
+      <div className="redraw__panel-heading">
+        <h2 id="redraw-tools-title" className="redraw__panel-title">
           Tools
         </h2>
       </div>
-      <div className="songrim__tool-grid" role="radiogroup" aria-label="Tools">
+      <div className="redraw__tool-grid" role="radiogroup" aria-label="Tools">
         {tools.map((tool) => (
           <button
             key={tool}
@@ -97,11 +97,11 @@ export function ToolPalette({ activeTool, onToolChange, tools }: ToolPaletteProp
             role="radio"
             aria-label={TOOL_LABELS[tool]}
             aria-checked={activeTool === tool}
-            className="songrim__tool-button"
+            className="redraw__tool-button"
             data-active={activeTool === tool ? 'true' : 'false'}
             onClick={() => onToolChange(tool)}
           >
-            <span className="songrim__tool-icon">{TOOL_ICONS[tool]}</span>
+            <span className="redraw__tool-icon">{TOOL_ICONS[tool]}</span>
           </button>
         ))}
       </div>

@@ -23,29 +23,29 @@ export function ColorEditorDialog({
   onClose
 }: ColorEditorDialogProps) {
   return (
-    <div className="songrim__dialog-backdrop" role="presentation" onClick={onClose}>
+    <div className="redraw__dialog-backdrop" role="presentation" onClick={onClose}>
       <div
-        className="songrim__dialog"
+        className="redraw__dialog"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="songrim-color-editor-title"
+        aria-labelledby="redraw-color-editor-title"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="songrim__panel-heading">
-          <h2 id="songrim-color-editor-title" className="songrim__panel-title">
+        <div className="redraw__panel-heading">
+          <h2 id="redraw-color-editor-title" className="redraw__panel-title">
             Custom {target} color
           </h2>
-          <button type="button" className="songrim__dialog-close" onClick={onClose} aria-label="Close color editor">
+          <button type="button" className="redraw__dialog-close" onClick={onClose} aria-label="Close color editor">
             Close
           </button>
         </div>
-        <div className="songrim__dialog-preview">
-          <span className="songrim__dialog-preview-chip" style={{ backgroundColor: color }} />
+        <div className="redraw__dialog-preview">
+          <span className="redraw__dialog-preview-chip" style={{ backgroundColor: color }} />
           <input aria-label="Custom color hex" value={hexValue} onChange={onHexChange} />
         </div>
-        <div className="songrim__sliders">
+        <div className="redraw__sliders">
           {CHANNELS.map((channel) => (
-            <label key={channel} className="songrim__slider">
+            <label key={channel} className="redraw__slider">
               <span>{channel.toUpperCase()}</span>
               <input
                 type="range"

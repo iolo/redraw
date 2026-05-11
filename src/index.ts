@@ -1,4 +1,4 @@
-export { SonGrim } from './SonGrim';
+export { Redraw } from './Redraw';
 export { loadImage, saveImage } from './utils/image';
-export type { SonGrimProps, SonGrimRef, Tool } from './types';
+export type { RedrawProps, RedrawRef, Tool } from './types';
 export { DEFAULT_SWATCHES } from './utils/drawing';

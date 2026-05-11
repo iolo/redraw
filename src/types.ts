@@ -8,7 +8,7 @@ export type Tool =
   | 'rectangle'
   | 'circle';
 
-export interface SonGrimProps {
+export interface RedrawProps {
   width?: number;
   height?: number;
   tool?: Tool;
@@ -20,7 +20,7 @@ export interface SonGrimProps {
   onChange?: (dataUrl: string) => void;
 }
 
-export interface SonGrimRef {
+export interface RedrawRef {
   getDataUrl: () => string;
   setDataUrl: (dataUrl: string) => Promise<void>;
   undo: () => void;

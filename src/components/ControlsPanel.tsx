@@ -15,7 +15,7 @@ const ICON_PROPS = {
   strokeWidth: 1.8,
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
-  className: 'songrim__action-icon-svg',
+  className: 'redraw__action-icon-svg',
   'aria-hidden': true
 };
 
@@ -29,13 +29,13 @@ export function ControlsPanel({
   onClear
 }: ControlsPanelProps) {
   return (
-    <section className="songrim__panel songrim__controls" aria-labelledby="songrim-controls-title">
-      <div className="songrim__panel-heading">
-        <h2 id="songrim-controls-title" className="songrim__panel-title">
+    <section className="redraw__panel redraw__controls" aria-labelledby="redraw-controls-title">
+      <div className="redraw__panel-heading">
+        <h2 id="redraw-controls-title" className="redraw__panel-title">
           Controls
         </h2>
       </div>
-      <label className="songrim__field">
+      <label className="redraw__field">
         <span>Stroke width</span>
         <input
           aria-label="Stroke width"
@@ -46,9 +46,9 @@ export function ControlsPanel({
           onChange={(event) => onStrokeWidthChange(Number(event.target.value))}
         />
       </label>
-      <div className="songrim__actions">
+      <div className="redraw__actions">
         <button type="button" onClick={onUndo} disabled={!canUndo} aria-label="Undo">
-          <span className="songrim__action-icon">
+          <span className="redraw__action-icon">
             <svg {...ICON_PROPS}>
               <path d="M9 7 5 11l4 4" />
               <path d="M5 11h8a5 5 0 1 1 0 10h-1" />
@@ -56,7 +56,7 @@ export function ControlsPanel({
           </span>
         </button>
         <button type="button" onClick={onRedo} disabled={!canRedo} aria-label="Redo">
-          <span className="songrim__action-icon">
+          <span className="redraw__action-icon">
             <svg {...ICON_PROPS}>
               <path d="m15 7 4 4-4 4" />
               <path d="M19 11h-8a5 5 0 1 0 0 10h1" />
@@ -64,7 +64,7 @@ export function ControlsPanel({
           </span>
         </button>
         <button type="button" onClick={onClear} aria-label="Clear">
-          <span className="songrim__action-icon">
+          <span className="redraw__action-icon">
             <svg {...ICON_PROPS}>
               <path d="M4 7h16" />
               <path d="M9 7V5h6v2" />

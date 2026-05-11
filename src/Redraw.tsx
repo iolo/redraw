@@ -6,7 +6,7 @@ import { ColorStatus } from './components/ColorStatus';
 import { ColorSwatches } from './components/ColorSwatches';
 import { ControlsPanel } from './components/ControlsPanel';
 import { ToolPalette } from './components/ToolPalette';
-import type { RgbaColor, SonGrimProps, SonGrimRef, Tool } from './types';
+import type { RgbaColor, RedrawProps, RedrawRef, Tool } from './types';
 import { normalizeHex, rgbaToHex, rgbaToString, toSliderState } from './utils/color';
 import {
   DEFAULT_SWATCHES,
@@ -65,7 +65,7 @@ const createEmptyDrawing = (canvas: HTMLCanvasElement | null) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
-export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
+export const Redraw = forwardRef<RedrawRef, RedrawProps>(function Redraw(
   {
     width = DEFAULT_WIDTH,
     height = DEFAULT_HEIGHT,
@@ -519,9 +519,9 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
   const currentActiveRgba = activeColorTarget === 'stroke' ? strokeRgba : fillRgba;
 
   return (
-    <div className="songrim">
-      <div className="songrim__workspace">
-        <aside className="songrim__sidebar">
+    <div className="redraw">
+      <div className="redraw__workspace">
+        <aside className="redraw__sidebar">
           <ToolPalette activeTool={currentTool} onToolChange={setCurrentTool} tools={TOOLS} />
           <ControlsPanel
             strokeWidth={currentStrokeWidth}
@@ -538,23 +538,23 @@ export const SonGrim = forwardRef<SonGrimRef, SonGrimProps>(function SonGrim(
           />
         </aside>
 
-        <section className="songrim__main">
-          <div className="songrim__stage-panel">
-            <div className="songrim__stage" style={{ width, height }}>
-              <canvas className="songrim__canvas songrim__canvas--background" ref={backgroundCanvasRef} />
+        <section className="redraw__main">
+          <div className="redraw__stage-panel">
+            <div className="redraw__stage" style={{ width, height }}>
+              <canvas className="redraw__canvas redraw__canvas--background" ref={backgroundCanvasRef} />
               <canvas
-                className="songrim__canvas songrim__canvas--drawing"
+                className="redraw__canvas redraw__canvas--drawing"
                 ref={drawingCanvasRef}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
               />
-              <canvas className="songrim__canvas songrim__canvas--preview" ref={previewCanvasRef} />
+              <canvas className="redraw__canvas redraw__canvas--preview" ref={previewCanvasRef} />
             </div>
           </div>
         </section>
 
-        <div className="songrim__footer">
+        <div className="redraw__footer">
           <ColorStatus
             strokeColor={currentStrokeColor}
             fillColor={currentFillColor}

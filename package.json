@@ -1,18 +1,27 @@
 {
-  "name": "@iolo/songrim",
+  "name": "@iolo/redraw",
   "version": "0.0.1",
+  "author": "Dongsu Jang",
   "description": "MSPaint-like drawing component for React",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iolo/redraw.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
-  "main": "./dist/songrim.cjs",
-  "module": "./dist/songrim.js",
+  "main": "./dist/redraw.cjs",
+  "module": "./dist/redraw.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/songrim.js",
-      "require": "./dist/songrim.cjs"
+      "import": "./dist/redraw.js",
+      "require": "./dist/redraw.cjs"
     },
-    "./styles.css": "./dist/songrim.css"
+    "./styles.css": "./dist/redraw.css"
   },
   "files": [
     "dist"
@@ -22,7 +31,8 @@
     "build": "vite build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "deploy": "gh-pages -d dist"
   },
   "peerDependencies": {
     "react": "^19.0.0",
