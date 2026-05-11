@@ -1,0 +1,96 @@
+.songrim {
+  display: grid;
+  gap: 1rem;
+  width: fit-content;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: #101418;
+}
+
+.songrim__toolbar {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  padding: 1rem;
+  border: 1px solid #d6d3d1;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fffefc 0%, #f2eee7 100%);
+}
+
+.songrim__field,
+.songrim__slider {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.songrim__color-group {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.songrim__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.songrim__swatch {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid rgba(16, 20, 24, 0.18);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.songrim__sliders {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.songrim__actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: start;
+  flex-wrap: wrap;
+}
+
+.songrim__actions button,
+.songrim__toolbar select,
+.songrim__toolbar input[type="text"],
+.songrim__toolbar input:not([type]) {
+  font: inherit;
+}
+
+.songrim__toolbar button {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: white;
+  cursor: pointer;
+}
+
+.songrim__toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.songrim__stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d6d3d1;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(16, 20, 24, 0.1);
+  touch-action: none;
+}
+
+.songrim__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.songrim__canvas--preview {
+  pointer-events: none;
+}
